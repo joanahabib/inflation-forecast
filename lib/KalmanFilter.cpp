@@ -148,22 +148,26 @@ std::vector<std::vector<double>> KalmanFilter::inverse(
     auto A = matrix;
     auto I = identity(n);
 
-    for (int i = 0; i < n; i++) {
-        double diag = A[i][i];
-        if (fabs(diag) < 1e-9)
-            throw std::runtime_error("Matrix not invertible");
-    for (int i = 0; i <n; i++)
-        A[i][j] /= diag;
-        I[i][j] /= diag;
-    }
-    for (int k = 0; k < n; k++) {
-        if (k == i) continue;
-        double factor = A[k][i];
-        for (int j = 0; j < n; j++)
-            A[k][j] -= factor * A[i][j];
-            I[k][j] -= factor * I[i][j];
+        for (int i = 0; i < n; i++) {
+            double diag = A[i][i];
+            if (fabs(diag) < 1e-9)
+                throw std::runtime_error("Matrix not invertible");
+            
+        for (int i = 0; i <n; i++)
+            A[i][j] /= diag;
+            I[i][j] /= diag;
+        }
+    
+        for (int k = 0; k < n; k++) {
+            if (k == i) continue;
+            double factor = A[k][i];
+            for (int j = 0; j < n; j++)
+                A[k][j] -= factor * A[i][j];
+                I[k][j] -= factor * I[i][j];
+            }
         }
     }
+    return I;
 }
 
     
