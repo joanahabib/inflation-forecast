@@ -5,6 +5,7 @@
 
 #include "dataset.h"
 #include "arx_forecaster.h"
+#include "KalmanFilter.h"
 
 int main(int argc, char** argv) {
     try {
@@ -57,6 +58,36 @@ int main(int argc, char** argv) {
                       << fc.yhat[static_cast<std::size_t>(i)] << "\n";
         }
 
+        std::cout <<"\nApplying Kalman Filter...\n";
+        int stateDim = 1;
+        int measDim = 1;
+
+        KalmanFilter kf(stateDim, measDim);
+
+        std::vector<std::vector<double>> A = {{1}};
+        std::vector<std::vector<double>> H = {{1}};
+        std::vector<std::vector<double>> Q = {{0.01}};
+        std::vector<std::vector<double>> R = {{0.1}};
+
+        kf.setMatrices(A, H, Q, R);
+
+        std::vector<double> x0 = {fc.yhat[0]};
+        std::vector<std::vector<double>> P0 = {{1}};
+        kf.initialize(x0, P0);
+
+        std::vector<double> smoothedForecast;
+
+        for (int i = 0; i < horizon; ++i) {
+            kf.predict();
+            kf.update({fc.yhat[static_cast<std::size_t>(i)>]});
+
+            double estimate = kf.getState()[0];
+            smoothedForecast.push_back(estimate);
+        }
+        std::cout << "\nSmoothed Forecast:\n";
+        for (int i = 0; i < horizon; ++i) {
+            std::cout << " t+" << (i + 1) << ": " << smoothedForecast[static_cast<std::size_t>(i)] << "\n";
+        
         std::cout << "\nDone.\n";
         return 0;
     } catch (const std::exception& ex) {
