@@ -51,5 +51,124 @@ std::vector<double> KalmanFilter::getState() const {
     return x;
 }
 
+std::vector<std::vector<double>> KalmanFilter::multiply(
+    const std::vector<std::vector<double>>& A,
+    const std::vector<std::vector<double>>& B) {
+
+    int n = A.size(), m = B[0].size(), p = B.size();
+    std::vector<std::vector<double>> result(n, std::vector<double>(m, 0));
+
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            for (int k = 0; k < p; k++)
+                result[i][j] += A[i][k] * B[k][j];
+    return result;
+}
+std::vector<double> KalmanFilter::multiply(
+    const std::vector<std::vector<double>>& A,
+    const std::vector<double>& x) {
+
+    int n = A.size, m = x.size
+    std::vector<double> result(n, 0);
+
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            result[i] += A[i][j] * x[j];
+    return result;
+}
+
+std::vector<double> KalmanFilter::multiply(
+    const std::vector<std::vector<double>>& A,
+    const std::vector<double>& x) {
+
+    int n = A.size(), m = x.size();
+    std::vector<double> result(n, 0);
+
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            result[i] += A[i][j] * x[j];
+    return result;
+}
+
+std::vector<std::vector<double>> KalmanFilter::transpose(
+    const std::vector<std::vector<double>>& A) {
+
+    int n = A.size(), m = A[0].size();
+    std::vector<std::vector<double>> T(m, std::vector<double>(n));
+
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            T[j][i] = A[i][j];
+    return T;
+}
+
+std::vector<std::vector<double>> KalmanFilter::add(
+    const std::vector<std::vector<double>>& A,
+    const std::vector<std::vector<double>>& B) {
+
+    int n = A.size(), m = A[0].size();
+    std::vector<std::vector<double>> result(n, std::vector<double>(m));
+
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            result[i][j] = A[i][j] + B[i][j];
+    return result;
+}
+
+std::vector<std::vector<double>> KalmanFilter::subtract(
+    const std::vector<std::vector<double>>& A,
+    const std::vector<std::vector<double>>& B) {
+
+    int n = A.size(), m = A[0].size();
+    std::vector<std::vector<double>> result(n, std::vector<double>(m));
+
+    for (int i = 0; i < n; i++)
+        for(int j = 0; j < m; j++)
+            result[i][j] = A[i][j] - B[i][j];
+    return result;
+}
+
+std::vector<std::vector<double>> KalmanFilter::identity(int size) {
+    std::vector<std::vector<double>> I(size, std::vector<double>(size, 0));
+    for (int i = 0; i < size; i++)
+        I[i][i] = 1;
+    return I;
+}
+
+std::vector<std::vector<double>> KalmanFilter::identity(int size) {
+    std::vector<std::vector<double>> I(size, std::vector<double>(size, 0));
+    for (int i = 0; i < size; i++)
+        I[i][i] = 1;
+    return I;
+}
+std::vector<std::vector<double>> KalmanFilter::inverse(
+    const std::vector<std::vector<double>>& matrix) {\
+
+    int n = matrix.size();
+    auto A = matrix;
+    auto I = identity(n);
+
+    for (int i = 0; i < n; i++) {
+        double diag = A[i][i];
+        if (fabs(diag) < 1e-9)
+            throw std::runtime_error("Matrix not invertible");
+    for (int i = 0; i <n; i++)
+        A[i][j] /= diag;
+        I[i][j] /= diag;
+    }
+    for (int k = 0; k < n; k++) {
+        if (k == i) continue;
+        double factor = A[k][i];
+        for (int j = 0; j < n; j++)
+            A[k][j] -= factor * A[i][j];
+            I[k][j] -= factor * I[i][j];
+        }
+    }
+}
+
+    
+
+
+
 
 
