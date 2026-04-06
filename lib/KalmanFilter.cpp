@@ -54,37 +54,27 @@ std::vector<double> KalmanFilter::getState() const {
     return x;
 }
 
-std::vector<std::vector<double>> KalmanFilter::multiply(
+std::vector<std::vector<double>> KalmanFilter::multiplyMatrixMatrix(
     const std::vector<std::vector<double>>& A,
     const std::vector<std::vector<double>>& B) {
 
-    int n = A.size(), m = B[0].size(), p = B.size();
-    std::vector<std::vector<double>> result(n, std::vector<double>(m, 0));
-
+    if (A.empty() || B.empty() || A[0].size() != B.size())
+        throw std::invalid_argument("Matrix dimensions do not match");
     for (int i = 0; i < n; i++)
         for (int j = 0; j < m; j++)
             for (int k = 0; k < p; k++)
                 result[i][j] += A[i][k] * B[k][j];
     return result;
 }
-std::vector<double> KalmanFilter::multiply(
+
+std::vector<double> KalmanFilter::multiplyMatrixVector(
     const std::vector<std::vector<double>>& A,
     const std::vector<double>& x) {
 
-    int n = A.size, m = x.size
-    std::vector<double> result(n, 0);
+    if (A.empty() || A[0].size() != x.size())
+        throw std::invalid_argument("Matrix and vector dimensions do not match");
 
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < m; j++)
-            result[i] += A[i][j] * x[j];
-    return result;
-}
-
-std::vector<double> KalmanFilter::multiply(
-    const std::vector<std::vector<double>>& A,
-    const std::vector<double>& x) {
-
-    int n = A.size(), m = x.size();
+    int n = A.size, m = x.size();
     std::vector<double> result(n, 0);
 
     for (int i = 0; i < n; i++)
@@ -129,13 +119,6 @@ std::vector<std::vector<double>> KalmanFilter::subtract(
         for(int j = 0; j < m; j++)
             result[i][j] = A[i][j] - B[i][j];
     return result;
-}
-
-std::vector<std::vector<double>> KalmanFilter::identity(int size) {
-    std::vector<std::vector<double>> I(size, std::vector<double>(size, 0));
-    for (int i = 0; i < size; i++)
-        I[i][i] = 1;
-    return I;
 }
 
 std::vector<std::vector<double>> KalmanFilter::identity(int size) {
