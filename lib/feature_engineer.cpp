@@ -22,12 +22,8 @@ SupervisedData FeatureEngineer::buildARX(
     }
 
     for (const std::string& col : exogenousColumns) {
-        if (!dataset.hasColumn(col)) {
-            throw std::runtime_error("FeatureEngineer::buildARX: missing exogenous column: " + col);
-        }
-
-        if (dataset.getColumn(col).size() != n) {
-            throw std::runtime_error("FeatureEngineer::buildARX: exogenous column length mismatch");
+        if (dataset.hasColumn(col) && dataset.getColumn(col).size() == n) {
+            validExog.push_back(col);
         }
     }
 
