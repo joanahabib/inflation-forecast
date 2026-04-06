@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Inflation Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <h1>🌍 Inflation Forecaster</h1>
+    <select id="country-select"></select>
+    <button id="run-btn">Run Forecast</button>
+  </aside>
+
+  <main class="main">
+
+    <div class="cards">
+
+      <div class="card">
+        <span>Next Value</span>
+        <h2 id="current">--</h2>
+      </div>
+
+      <div class="card">
+        <span>Trend</span>
+        <h2 id="trend">--</h2>
+      </div>
+
+    </div>
+
+    <div class="chart-box">
+      <canvas id="chart"></canvas>
+    </div>
+
+  </main>
+
+</div>
+
+<script src="renderer.js"></script>
+
+</body>
+</html>
