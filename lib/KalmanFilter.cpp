@@ -25,26 +25,29 @@ void KalmanFilter::initialize(
 }
 
 void KalmanFilter::predict() {
-    x = multiply(A, x);
-    P = add(multiply(A, P), transpose(A)), Q);
+    x = multiplyMatrixVector(A, x);
+    P = multiplyMatrixMatrix(multiplyMatrixMatrix(A, P), transpose(A));
+    P = add(P, Q);
 }
 
 void KalmanFilter::update(const std::vector<double>& z) {
     auto Ht = transpose(H);
-    auto S = add(multiply(multiply(H, P), Ht), R);
-    auto K = multiply(multiply(P, Ht), inverse(S));
+    auto S = add(multiplyMatrixMatrix(multiplyMatrixMatrix(H, P), Ht), R);
+    auto K = multiplyMatrixMatrix(multiplyMatrixMatrix(P, Ht), inverse(S));
 
     auto y = z;
-    auto Hx = multiply(H, x);
-    for (size_t i = 0; i < y.size(), i++) {
+    auto Hx = multiplyMatrixVector(H, x);
+
+    for (size_t i = 0; i < y.size(); i++)
         y[i] -= Hx[i];
-    }
-    auto K_y = multiply(K,y);
-    for (size_t i = 0; i < x.size(), i++) {
-        x[i] = K_y[i];
-    }
+
+    auto K_y = multiplyMatrixVector(K, y);
+
+    for (size_t i = 0; i < x.size(); i++)
+        x[i] += K_y[i];
+
     auto I = identity(stateDim);
-    P = multiply(subtract(I, multiply(K, H)), P);
+    P = multiplyMatrixMatrix(subtract(I, multiplyMatrixMatrix(K, H)), P);
 }
 
 std::vector<double> KalmanFilter::getState() const {
