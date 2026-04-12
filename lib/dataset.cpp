@@ -45,14 +45,25 @@ Dataset Dataset::loadCSV(const std::string& path) {
 
     auto headers = splitCSVLine(headerLine);
 
-    if (headers.size() < 2) {
-        throw std::runtime_error("Dataset::loadCSV: CSV must contain date + at least one column");
+    bool hasISO = false;
+    size_t isoIndex = 0;
+    size_t dateIndex = 0;
+
+    for (size_t i = 0; i < headers.size(); ++i) {
+        if (headers[i] == "iso") {
+            hasISO = true;
+            isoIndex = i;
+        }
+        if (headers[i] == "date") {
+            dateIndex = i;
+        }
     }
 
-    for (size_t i = 1; i < headers.size(); ++i) {
-        dataset.columns[headers[i]] = {};
+    for (size_t i = 0; i < headers.size(); ++i) {
+        if (headers[i] != "iso" && headers[i] != "date") {
+            dataset.columns[headers[i]] = {};
+        }
     }
-
     std::string line;
 
     while (std::getline(file, line)) {
@@ -65,10 +76,16 @@ Dataset Dataset::loadCSV(const std::string& path) {
         if (values.size() != headers.size()) {
             continue;
         }
+        if (hasISO) {
+            if (values[isoIndex] != iso) {
+                continue;
+            }
+        }
 
-        dataset.dates.push_back(values[0]);
+        dataset.dates.push_back(values[dateIndex]);
 
         for (size_t i = 1; i < values.size(); ++i) {
+            if (headers[i] == "iso" || headers[i] == "date") continue;
             double value = 0.0;
 
             try {
@@ -81,7 +98,7 @@ Dataset Dataset::loadCSV(const std::string& path) {
         }
     }
 
-    if (!dataset.hasColumn("inflation_yoy")) {
+    if (!dataset.hasColumn("inflation_yoy") && !dataset.hasColumn("inflation")) {
         throw std::runtime_error("Dataset::loadCSV: required column inflation_yoy not found");
     }
 
