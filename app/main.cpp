@@ -33,13 +33,21 @@ void saveResults(
 
 int main(int argc, char** argv) {
     try {
-        if (argc < 3) return 1;
-            std::string path = argv[1];
-            std::string iso = argv[2];
+        if (argc < 3) {
+            std::cerr << "Error: missing arguments\n";
+        }
+            
+        std::string path = argv[1];
+        std::string iso = argv[2];
 
         Dataset dataset = Dataset::loadCSV(path, iso);
 
-        if (dataset.size() == 0) return 1;
+        std::cerr << "Dataset size: " << dataset.size() << "\n";
+
+        if (dataset.size() == 0) {
+            std::cerr << "Error: dataset is empty\n"
+            return 1;
+        }
         
         int p = 2;
         std::vector<std::string> exogenousColumns = {
@@ -58,14 +66,16 @@ int main(int argc, char** argv) {
         std::vector<std::vector<double>> futureExog(exogenousColumns.size());
 
         for (std::size_t j = 0; j < exogenousColumns.size(); ++j) {
-            const std::vector<double>& column = dataset.getColumn(exogenousColumns[j]);
-            double lastValue = column.back();
-            futureExog[j].assign(horizon, lastValue);
+            if (dataset.hasColumn(exogenousColumns[j])) {
+                const std::vector<double>& column = dataset.getColumn(exogenousColumns[j]);
+                double lastValue = column.back();
+                futureExog[j].assign(horizon, lastValue);
+            }
+            else { 
+                futureExog[j].assign(horizon, 0.0);
+            }
         }
-        else { 
-            futureExog[j].assign(horizon, 0.0);
-        }
-
+        
         Forecast fc = model.forecast(horizon, exogenousColumns, futureExog);
 
         KalmanFilter kf(1, 1);
@@ -73,7 +83,7 @@ int main(int argc, char** argv) {
         kf.setMatrices({{1}}, {{1}}, {{0.01}}, {{0.1}});
         kf.initialize({fc.yhat[0]}, {{1}});
 
-        std::vector<double> smoothedForecast;
+        std::vector<double> smoothed;
 
         for (int i = 0; i < horizon; ++i) {
             kf.predict();
@@ -95,7 +105,8 @@ int main(int argc, char** argv) {
 
         return 0;
             
-        } catch (...) {
-            return 1;
-        }
+    } catch (const std::exception& e) {
+        std::cerr << "Exception: " << e.what() << std::endl;
+        return 1;
     }
+}
