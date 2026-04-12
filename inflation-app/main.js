@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const { execFile } = require("child_process");
 const path = require("path");
 
@@ -16,11 +16,21 @@ function createWindow() {
 
 app.whenReady().then(createWindow);
 
-ipcMain.handle("run-model", async (event, iso) => {
+ipcMain.handle("open-file", async () => {
+  const result = await dialog.showOpenDialog({
+    properies: ["openFile"],
+    filters: [{ name: "CSV Files", extensions: ["csv"] }]
+  });
+  if (result.canceled) return null;
+
+  return { filePath: result.filePaths[0] };
+});
+  
+ipcMain.handle("run-model", async (event, filePath, iso) => {
   return new Promise((resolve) => {
 
     const exePath = path.join(__dirname, "..", "build", "influx_app");
-    const dataPath = path.join(__dirname, "..", "data", "sample_inflation.csv");
+    const dataPath = filePath || path.join(__dirname, "..", "data", "sample_inflation.csv");
 
     execFile(exePath, [dataPath, iso], (err, stdout, stderr) => {
 
