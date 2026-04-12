@@ -1,8 +1,19 @@
 const countries = [
-  { iso: "BG", name: "Bulgaria" },
-  { iso: "US", name: "USA" },
+  { iso: "AU", name: "Australia" },
+  { iso: "AT", name: "Austria" },
+  { iso: "BE", name: "Belgium" },
+  { iso: "BG", name: "Bulgaria"},
+  { iso: "CA", name: "Canada" },
+  { iso: "CZ", name: "Czechia" },
+  { iso: "FR", name: "France" },
   { iso: "DE", name: "Germany" },
-  { iso: "JP", name: "Japan" }
+  { iso: "IT", name: "Italy" },
+  { iso: "JP", name: "Japan" },
+  { iso: "NL", name: "Netherlands" },
+  { iso: "ES", name: "Spain" },
+  { iso: "SE", name: "Sweden" },
+  { iso: "CH", name: "Switzerland" },
+  { iso: "UK", name: "United Kingdom" }
 ];
 
 const select = document.getElementById("country-select");
