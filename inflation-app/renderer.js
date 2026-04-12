@@ -2,43 +2,7 @@ const countries = [
   { iso: "BG", name: "Bulgaria" },
   { iso: "US", name: "USA" },
   { iso: "DE", name: "Germany" },
-  { iso: "JP", name: "Japan" },
-  { iso: "UK", name: "United Kingdom"},
-  { iso: "FR", name: "France"},
-  { iso: "IT", name: "Italy"},
-  { iso: "SP", name: "Spain"},
-  { iso: "QT", name: "Qatar"},
-  { iso: "RU", name: "Russia"},
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
-  { iso: "", name: },
+  { iso: "JP", name: "Japan" }
 ];
 
 const select = document.getElementById("country-select");
@@ -93,13 +57,7 @@ const chart = new Chart(ctx, {
   }
 });
 
-runBtn.onclick = async () => {
-  const iso = select.value;
-
-  const result = await window.api.runModel(iso);
-
-  console.log(result);
-
+function updateUI {
   const arx = (result.forecast || []).map(Number);
   const kalman = (result.kalman || result.smoothed || []).map(Number);
 
@@ -111,7 +69,6 @@ runBtn.onclick = async () => {
   const base = arx.length ? arx : kalman;
 
   chart.data.labels = base.map((_, i) => "t+" + (i + 1));
-
   chart.data.datasets[0].data = arx;
   chart.data.datasets[1].data = kalman;
 
@@ -131,4 +88,21 @@ runBtn.onclick = async () => {
     trendEl.innerText = "📉 Down";
     trendEl.style.color = "#ef4444";
   }
+};
+
+async function selectFileAndRun() {
+  const result = await window.api.openFile();
+  if (!result) return;
+
+  const { filePath } = result;
+  const iso = select.value;
+
+  const resultData = await window.api.runModel(filePath, iso);
+  updateUI(resultData)
+}
+
+runBtn.onclick = async () => {
+  const iso = select.value;
+  const result = await window.api.runModel(null, iso);
+  updateUI(result);
 };
